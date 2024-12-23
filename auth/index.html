@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система Аутентификации</title>
+    <style>
+        /* Базовый сброс */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Стили обертки */
+        .wrapper {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            width: 900px;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        /* Стили боковой панели */
+        .sidebar {
+            background: linear-gradient(135deg, #4a90e2, #50e3c2);
+            width: 350px;
+            padding: 40px;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sidebar h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Стили контейнера формы */
+        .form-container {
+            flex-grow: 1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            background-color: #f9fbfc;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .tab {
+            cursor: pointer;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 0 15px;
+            color: #555;
+            background-color: #e0e7ff;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+            z-index: 2;
+            user-select: none;
+        }
+
+        .tab.active {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Стили иконки глазика */
+        .toggle-password {
+            position: absolute;
+            top: 70%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            fill: #888;
+            transition: fill 0.3s, transform 0.3s;
+            pointer-events: all;
+        }
+
+        .toggle-password:hover {
+            fill: #4a90e2;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Стили группы кнопок */
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background-color: #4a90e2;
+            color: #fff;
+            padding: 12px 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 48%;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn:hover {
+            background-color: #357ab8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(53, 122, 184, 0.3);
+        }
+
+        /* Стили ссылки сброса пароля */
+        .reset-link {
+            color: #4a90e2;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: color 0.3s;
+        }
+
+        .reset-link:hover {
+            color: #357ab8;
+        }
+
+        /* Стили сообщений об ошибках */
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Показ активной формы без анимации */
+        #register-form, #login-form {
+            display: none;
+        }
+
+        #register-form.active, #login-form.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Боковая панель -->
+        <div class="sidebar">
+            <h1>MyApp</h1>
+            <h2>Добро пожаловать!</h2>
+            <p>Присоединяйтесь к нам и исследуйте удивительные возможности, которые мы предлагаем. Безопасная и бесшовная аутентификация ждет вас.</p>
+        </div>
+
+        <!-- Контейнер формы -->
+        <div class="form-container">
+            <!-- Вкладки -->
+            <div class="tabs">
+                <div id="register-tab" class="tab active" onclick="showForm('register')">Регистрация</div>
+                <div id="login-tab" class="tab" onclick="showForm('login')">Вход</div>
+            </div>
+
+            <!-- Форма регистрации -->
+            <div id="register-form" class="active">
+                <div id="error-message" class="error"></div>
+                <div class="form-group">
+                    <label for="email">Электронная почта</label>
+                    <input type="email" id="email" placeholder="Введите вашу почту">
+                </div>
+                <div class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" placeholder="Введите ваше имя пользователя">
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введите ваш пароль">
+                    <!-- Иконка глазика -->
+                    <svg class="toggle-password" onclick="togglePassword('password')" viewBox="0 0 24 24">
+                        <path id="eye-icon-password" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.04 0-5.5-2.46-5.5-5.5S8.96 6.5 12 6.5s5.5 2.46 5.5 5.5-2.46 5.5-5.5 5.5zm0-9a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+                    </svg>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Подтвердите пароль</label>
+                    <input type="password" id="confirm-password" placeholder="Подтвердите ваш пароль">
+                    <!-- Иконка глазика -->
+                    <svg class="toggle-password" onclick="togglePassword('confirm-password')" viewBox="0 0 24 24">
+                        <path id="eye-icon-confirm-password" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.04 0-5.5-2.46-5.5-5.5S8.96 6.5 12 6.5s5.5 2.46 5.5 5.5-2.46 5.5-5.5 5.5zm0-9a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+                    </svg>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="register()">Зарегистрироваться</button>
+                </div>
+            </div>
+
+            <!-- Форма входа -->
+            <div id="login-form">
+                <div id="error-message-login" class="error"></div>
+                <div class="form-group">
+                    <label for="login-username">Электронная почта/Имя пользователя</label>
+                    <input type="text" id="login-username" placeholder="Введите вашу почту или имя пользователя">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" placeholder="Введите ваш пароль">
+                    <!-- Иконка глазика -->
+                    <svg class="toggle-password" onclick="togglePassword('login-password')" viewBox="0 0 24 24">
+                        <path id="eye-icon-login-password" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.04 0-5.5-2.46-5.5-5.5S8.96 6.5 12 6.5s5.5 2.46 5.5 5.5-2.46 5.5-5.5 5.5zm0-9a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+                    </svg>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="login()">Войти</button>
+                </div>
+                <div class="reset-link" onclick="alert('Функция сброса пароля скоро будет доступна!')">Забыли пароль?</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функция для загрузки аккаунтов из localStorage
+        function loadAccounts() {
+            const storedAccounts = localStorage.getItem('accounts');
+            return storedAccounts ? JSON.parse(storedAccounts) : {};
+        }
+
+        // Функция для сохранения аккаунтов в localStorage
+        function saveAccounts(accounts) {
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+        }
+
+        // Функция для отображения выбранной формы
+        function showForm(form) {
+            const registerTab = document.getElementById('register-tab');
+            const loginTab = document.getElementById('login-tab');
+            const registerForm = document.getElementById('register-form');
+            const loginForm = document.getElementById('login-form');
+
+            if (form === 'register') {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerForm.classList.add('active');
+                loginForm.classList.remove('active');
+            } else {
+                registerTab.classList.remove('active');
+                loginTab.classList.add('active');
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+            }
+        }
+
+        // Функция для регистрации нового пользователя
+        function register() {
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            const errorMessage = document.getElementById('error-message');
+
+            // Простейшая проверка email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!email || !username || !password || !confirmPassword) {
+                errorMessage.textContent = 'Все поля обязательны для заполнения.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (!emailRegex.test(email)) {
+                errorMessage.textContent = 'Пожалуйста, введите корректный адрес электронной почты.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMessage.textContent = 'Пароль должен содержать не менее 6 символов.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Пароли не совпадают.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const accounts = loadAccounts();
+
+            if (accounts[username] || Object.values(accounts).some(account => account.email === email)) {
+                errorMessage.textContent = 'Учетная запись с таким именем пользователя или электронной почтой уже существует.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Сохранение учетной записи
+            accounts[username] = { email, password };
+            saveAccounts(accounts);
+            alert('Регистрация прошла успешно! Пожалуйста, войдите в систему.');
+
+            // Переключаемся на форму входа
+            showForm('login');
+
+            // Очистка формы регистрации
+            document.getElementById('email').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirm-password').value = '';
+            errorMessage.textContent = '';
+            errorMessage.style.display = 'none';
+        }
+
+        // Функция для входа пользователя
+        function login() {
+            const identifier = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const errorMessageLogin = document.getElementById('error-message-login');
+
+            if (!identifier || !password) {
+                errorMessageLogin.textContent = 'Пожалуйста, введите вашу почту/имя пользователя и пароль.';
+                errorMessageLogin.style.display = 'block';
+                return;
+            }
+
+            const accounts = loadAccounts();
+
+            // Поиск пользователя по имени или email
+            let user = accounts[identifier];
+            if (!user) {
+                user = Object.values(accounts).find(account => account.email === identifier);
+                if (user) {
+                    // Найден по email, нужно найти соответствующее имя пользователя
+                    const username = Object.keys(accounts).find(key => accounts[key].email === identifier);
+                    identifier = username;
+                }
+            }
+
+            if (!user || user.password !== password) {
+                errorMessageLogin.textContent = 'Неверная почта/имя пользователя или пароль.';
+                errorMessageLogin.style.display = 'block';
+                return;
+            }
+
+            // Устанавливаем состояние аутентификации
+            localStorage.setItem('loggedInUser', identifier);
+
+            alert('Вход выполнен успешно!');
+
+            // Перенаправление на внутреннюю часть сайта
+            window.location.href = '../main/index.html';
+        }
+
+        // Функция для переключения видимости пароля
+        function togglePassword(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const svgIcon = passwordField.nextElementSibling;
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                // Изменение на иконку "закрытый глаз"
+                svgIcon.innerHTML = `
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.04 0-5.5-2.46-5.5-5.5S8.96 6.5 12 6.5s5.5 2.46 5.5 5.5-2.46 5.5-5.5 5.5zm3.5-5.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z"/>
+                    <path d="M19.3 4.71L4.7 19.3l1.42 1.42 14.6-14.6-1.42-1.42z"/>
+                `;
+            } else {
+                passwordField.type = 'password';
+                // Изменение на иконку "открытый глаз"
+                svgIcon.innerHTML = `
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.04 0-5.5-2.46-5.5-5.5S8.96 6.5 12 6.5s5.5 2.46 5.5 5.5-2.46 5.5-5.5 5.5zm0-9a3.5 3.5 0 100 7 3.5 3.5 0 000-7z"/>
+                `;
+            }
+        }
+
+        // Опционально: скрытие сообщений об ошибках при вводе
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                const errorDiv = input.parentElement.querySelector('.error');
+                if (errorDiv) {
+                    errorDiv.textContent = '';
+                    errorDiv.style.display = 'none';
+                }
+            });
+        });
+
+
+    </script>
+</body>
+</html>

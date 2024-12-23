@@ -1,0 +1,294 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+}
+
+/* Левая навигационная панель */
+.sidebar {
+    width: 60px;
+    background-color: #87CEFA; /* Голубой фон */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    position: fixed;
+    height: 100%;
+}
+
+.icon {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 50%;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.icon.settings {
+    background-color: #FFD700; /* Золотисто-жёлтая для настроек */
+    margin-top: auto;
+    margin-bottom: 20px;
+}
+
+/* Основной контент */
+.main-content {
+    margin-left: 60px;
+    padding: 20px;
+    width: calc(100% - 60px);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Область с информацией о пользователе */
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    background-color: #ddd;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 20px;
+}
+
+.avatar-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h2 {
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+.user-info p {
+    margin: 0;
+}
+
+/* Линейка этапов жизненного цикла проекта */
+.lifecycle-stages {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.lifecycle-stages .stage {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    position: relative;
+}
+
+.lifecycle-stages .stage:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -1px;
+    width: 2px;
+    height: 20px;
+    background-color: #ccc;
+    transform: translateY(-50%);
+}
+
+.lifecycle-stages .stage.active {
+    background-color: #87CEFA;
+    font-weight: bold;
+}
+
+/* Панель с дорожной картой */
+.roadmap {
+    position: relative;
+    margin-bottom: 30px;
+    height: 200px; /* Можно настроить по необходимости */
+    background-color: #e0e0e0;
+}
+
+.roadmap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.roadmap-marker {
+    position: absolute;
+    bottom: 10px;
+    left: 20%; /* Позиция пометки */
+    transform: translateX(-50%);
+    background-color: #ff0000;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Диаграмма с узлами */
+.graph-container {
+    width: 100%;
+    height: calc(100vh - 300px); /* Устанавливаем высоту с учетом других элементов */
+    border: 1px solid #ccc;
+    position: relative;
+    background-color: #f9f9f9;
+    overflow: hidden;
+}
+
+/* Панель управления */
+.controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.controls button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #87CEFA;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.controls button:hover {
+    background-color: #00BFFF;
+}
+
+/* Масштабирование и панорамирование */
+svg {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+svg:active {
+    cursor: grabbing;
+}
+
+/* Стили для бокового меню */
+#sideMenu {
+    position: absolute;
+    left: -200px;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    background: #f8f9fa;
+    border-right: 1px solid #ddd;
+    transition: left 0.3s;
+    z-index: 15;
+    padding-top: 60px;
+}
+
+#sideMenu.open {
+    left: 0;
+}
+
+#sideMenu button {
+    width: 90%;
+    margin: 10px 5%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#menuToggle {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    z-index: 20;
+    background: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#menuToggle:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для названий узлов */
+.node-name {
+    font-size: 18px;
+    font-weight: bold;
+    text-anchor: middle;
+    pointer-events: none;
+    user-select: none;
+    fill: #333;
+    text-shadow: 1px 1px 2px #fff;
+}
+
+/* Гайд по использованию */
+.guide {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 300px;
+    font-size: 14px;
+}
+
+.guide ul {
+    list-style: disc;
+    margin-left: 20px;
+}
+
+.guide li {
+    margin-bottom: 5px;
+}
+
+/* Этапы жизненного цикла проекта в виде переключаемых кнопок */
+.lifecycle-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.stage-button {
+    flex: 1;
+    padding: 10px 15px;
+    margin: 0 5px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.stage-button.active {
+    background-color: #87CEFA;
+    font-weight: bold;
+}
+
+.stage-button:hover {
+    background-color: #add8e6;
+}
+
+/* Удаляем стили для дорожной карты */
+.roadmap {
+    display: none;
+}
